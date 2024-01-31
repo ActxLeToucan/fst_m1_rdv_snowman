@@ -36,10 +36,10 @@ Vec3f rotate(const Vec3f &v) {
 float fractal_brownian_motion(const Vec3f &x) { // this is a bad noise function with lots of artifacts. TODO: find a better one
     Vec3f p = rotate(x);
     float f = 0;
-    f += 0.5000*noise(p); p = p*2.32;
-    f += 0.2500*noise(p); p = p*3.03;
-    f += 0.1250*noise(p); p = p*2.61;
-    f += 0.0625*noise(p);
+    f += 0.5000f*noise(p); p = p*2.32;
+    f += 0.2500f*noise(p); p = p*3.03;
+    f += 0.1250f*noise(p); p = p*2.61;
+    f += 0.0625f*noise(p);
     return f/0.9375;
 }
 
@@ -49,7 +49,7 @@ struct Sphere {
 
     Sphere(const Vec3f &o, const float &r) : orig(o), radius(r) {}
 
-    float getDistance(const Vec3f &p) const {
+    [[nodiscard]] float getDistance(const Vec3f &p) const {
         return (p - orig).norm() - radius;
     }
 };
@@ -64,7 +64,7 @@ struct Shape {
                    const float &noise_amplitude = 0., const float &rFusionLisse = 0.)
                    : spheres(spheres), color(color), noise_amplitude(noise_amplitude), rFusionLisse(rFusionLisse) {}
 
-    float getDistance(const Vec3f &p) const {
+    [[nodiscard]] float getDistance(const Vec3f &p) const {
         float displacement = -fractal_brownian_motion(p*3.4)*noise_amplitude;
 
         // ----------------- Fusion lisse -----------------
@@ -72,7 +72,7 @@ struct Shape {
         // Distance initiale
         float res = !spheres.empty() ? spheres[0].getDistance(p) : std::numeric_limits<float>::max();
         // Parcours des autres sphères
-        for (int i = 1; i < spheres.size(); ++i) {
+        for (size_t i = 1; i < spheres.size(); ++i) {
             float dst = spheres[i].getDistance(p);
             res = smin(res, dst, rFusionLisse);
         }
@@ -84,8 +84,8 @@ struct Shape {
     private :
     // à partir du code du dernier TP d'Infographie de l'année dernière
     static float smin(float dA, float dB, float r) {
-        float c = std::clamp(.5 * (1.0 + (dB - dA) / r), 0., 1.);
-        return lerp(dB, dA, c) - r * c * (1.0 - c);
+        float c = std::clamp(0.5f * (1.0f + (dB - dA) / r), 0.0f, 1.0f);
+        return lerp(dB, dA, c) - r * c * (1.0f - c);
     }
 };
 
