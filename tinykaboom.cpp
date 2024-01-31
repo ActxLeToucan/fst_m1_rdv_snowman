@@ -44,8 +44,8 @@ float fractal_brownian_motion(const Vec3f &x) { // this is a bad noise function 
 }
 
 struct Sphere {
-    Vec3f orig;
-    float radius;
+    const Vec3f orig;
+    const float radius;
 
     Sphere(const Vec3f &o, const float &r) : orig(o), radius(r) {}
 
@@ -55,20 +55,37 @@ struct Sphere {
 };
 
 struct Shape {
-    std::vector<Sphere> spheres;
-    float noise_amplitude; // amount of noise applied to the sphere (towards the center)
-    Vec3f color;
+    const std::vector<Sphere> spheres;
+    const Vec3f color = Vec3f(1, 1, 1);
+    const float noise_amplitude = 0.; // amount of noise applied to the sphere (towards the center)
+    const float rFusionLisse = 0.;
 
-    Shape(const std::vector<Sphere> &spheres) : spheres(spheres), noise_amplitude(0), color(Vec3f(1, 1, 1)) {}
-    Shape(const std::vector<Sphere> &spheres, const float &noise_amplitude, const Vec3f &color) : spheres(spheres), noise_amplitude(noise_amplitude), color(color) {}
+    explicit Shape(const std::vector<Sphere> &spheres, const Vec3f &color = Vec3f(1, 1, 1),
+                   const float &noise_amplitude = 0., const float &rFusionLisse = 0.)
+                   : spheres(spheres), color(color), noise_amplitude(noise_amplitude), rFusionLisse(rFusionLisse) {}
 
     float getDistance(const Vec3f &p) const {
-        float minDistance = std::numeric_limits<float>::max();
-        for (const auto &sphere : spheres) {
-            minDistance = std::min(minDistance, sphere.getDistance(p));
-        }
         float displacement = -fractal_brownian_motion(p*3.4)*noise_amplitude;
-        return minDistance + displacement;
+
+        // ----------------- Fusion lisse -----------------
+        // à partir du code du dernier TP d'Infographie de l'année dernière
+        // Distance initiale
+        float res = !spheres.empty() ? spheres[0].getDistance(p) : std::numeric_limits<float>::max();
+        // Parcours des autres sphères
+        for (int i = 1; i < spheres.size(); ++i) {
+            float dst = spheres[i].getDistance(p);
+            res = smin(res, dst, rFusionLisse);
+        }
+        // -------------------------------------------------
+
+        return res + displacement;
+    }
+
+    private :
+    // à partir du code du dernier TP d'Infographie de l'année dernière
+    static float smin(float dA, float dB, float r) {
+        float c = std::clamp(.5 * (1.0 + (dB - dA) / r), 0., 1.);
+        return lerp(dB, dA, c) - r * c * (1.0 - c);
     }
 };
 
@@ -76,11 +93,26 @@ const Shape body = Shape({
        Sphere(Vec3f(0, -1.5, 0), 1.),
        Sphere(Vec3f(0, -0.1, 0), 0.66),
        Sphere(Vec3f(0, 0.85, 0), 0.35)
-}, 0.15, Vec3f(1, 1, 1));
+}, Vec3f(1, 1, 1), 0.15);
+const Shape carrot = Shape({ // TODO: donner une vraie forme de carotte à la carotte et la placer correctement
+       Sphere(Vec3f(1.5, 1, 0), 0.5),
+       Sphere(Vec3f(1.5, 0, 0), 0.25),
+       Sphere(Vec3f(2.5, 0, 0), 0.25),
+       Sphere(Vec3f(2, -0.5, 0), 0.25),
+}, Vec3f(0.89, 0.38, 0.12), 0.04, 0.5);
+
+const std::vector<Shape> shapes = {body, carrot};
 
 float signed_distance(const Vec3f &p, Vec3f &color) { // this function defines the implicit surface we render
-    color = body.color;
-    return body.getDistance(p);
+    float d = std::numeric_limits<float>::max();
+    for (const auto & shape : shapes) {
+        float distance = shape.getDistance(p);
+        if (distance < d) {
+            d = distance;
+            color = shape.color;
+        }
+    }
+    return d;
 }
 
 bool sphere_trace(const Vec3f &orig, const Vec3f &dir, Vec3f &pos, Vec3f &color) {
