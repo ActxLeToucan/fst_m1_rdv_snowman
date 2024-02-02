@@ -103,13 +103,13 @@ const Shape carrot = Shape({ // TODO: donner une vraie forme de carotte à la ca
 
 const std::vector<Shape> shapes = {body, carrot};
 
-float signed_distance(const Vec3f &p, Vec3f &color) { // this function defines the implicit surface we render
+float signed_distance(const Vec3f &p, Vec3f *color = nullptr) { // this function defines the implicit surface we render
     float d = std::numeric_limits<float>::max();
-    for (const auto & shape : shapes) {
+    for (const Shape &shape : shapes) {
         float distance = shape.getDistance(p);
         if (distance < d) {
             d = distance;
-            color = shape.color;
+            if (color) *color = shape.color;
         }
     }
     return d;
@@ -118,19 +118,19 @@ float signed_distance(const Vec3f &p, Vec3f &color) { // this function defines t
 bool sphere_trace(const Vec3f &orig, const Vec3f &dir, Vec3f &pos, Vec3f &color) {
     pos = orig;
     for (size_t i=0; i<128; i++) {
-        float d = signed_distance(pos, color);
+        float d = signed_distance(pos, &color);
         if (d < 0) return true;
         pos = pos + dir*std::max(d*0.1f, .01f); // note that the step depends on the current distance, if we are far from the surface, we can do big steps
     }
     return false;
 }
 
-Vec3f distance_field_normal(const Vec3f &pos, Vec3f &color) { // simple finite differences, very sensitive to the choice of the eps constant
+Vec3f distance_field_normal(const Vec3f &pos) { // simple finite differences, very sensitive to the choice of the eps constant
     const float eps = 0.1;
-    float d = signed_distance(pos, color);
-    float nx = signed_distance(pos + Vec3f(eps, 0, 0), color) - d;
-    float ny = signed_distance(pos + Vec3f(0, eps, 0), color) - d;
-    float nz = signed_distance(pos + Vec3f(0, 0, eps), color) - d;
+    float d = signed_distance(pos);
+    float nx = signed_distance(pos + Vec3f(eps, 0, 0)) - d;
+    float ny = signed_distance(pos + Vec3f(0, eps, 0)) - d;
+    float nz = signed_distance(pos + Vec3f(0, 0, eps)) - d;
     return Vec3f(nx, ny, nz).normalize();
 }
 
@@ -149,7 +149,7 @@ int main() {
             Vec3f hit, color;
             if (sphere_trace(Vec3f(0, 0, 5), Vec3f(dir_x, dir_y, dir_z).normalize(), hit, color)) { // the camera is placed to (0,0,3) and it looks along the -z axis
                 Vec3f light_dir = (Vec3f(10, 10, 10) - hit).normalize();                     // one light is placed to (10,10,10)
-                float light_intensity  = std::max(0.4f, light_dir*distance_field_normal(hit, color));
+                float light_intensity  = std::max(0.4f, light_dir*distance_field_normal(hit));
                 framebuffer[i+j*width] = color * light_intensity;
             } else {
                 framebuffer[i+j*width] = Vec3f(0.2, 0.7, 0.8); // background color
