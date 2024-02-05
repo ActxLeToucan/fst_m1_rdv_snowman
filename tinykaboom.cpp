@@ -107,14 +107,21 @@ const Shape eye = Shape({
         Sphere(Vec3f(-0.19, 0.90, 0.32), 0.005),
         Sphere(Vec3f(-0.19, 0.99, 0.32), 0.005),
 }, Vec3f(0.228, 0.278, 0.278), 0.09, 0.12);
-
 const Shape stone = Shape({ 
         Sphere(Vec3f(0, -1.5, 0.98), 0.045),
         Sphere(Vec3f(0, -0.85, 0.75), 0.045),
         Sphere(Vec3f(0, -0.1, 0.64), 0.045),
 }, Vec3f(0.328, 0.328, 0.328), 0.15);
+const Shape scarf_part1 = Shape({
+        Sphere(Vec3f(0, 0.52, 0), 0.44)
+}, Vec3f(0.67, 0.11, 0.12), 0.05, 0);
+const Shape scarf_part2 = Shape({
+        Sphere(Vec3f(0.18, 0.61, 0.28), 0.15),
+        Sphere(Vec3f(0.32, 0.24, 0.5), 0.09),
+        Sphere(Vec3f(0.2, -0.1, 0.64), 0.09),
+}, Vec3f(0.67, 0.11, 0.12), 0.05, 0.5);
 
-const std::vector<Shape> shapes = {body, carrot, eye, stone};
+const std::vector<Shape> shapes = {body, carrot, eye, stone, scarf_part1, scarf_part2};
 
 float signed_distance(const Vec3f &p, Vec3f *color = nullptr) { // this function defines the implicit surface we render
     float d = std::numeric_limits<float>::max();
@@ -147,9 +154,18 @@ Vec3f distance_field_normal(const Vec3f &pos) { // simple finite differences, ve
     return Vec3f(nx, ny, nz).normalize();
 }
 
-int main() {
-    const int   width    = 640;     // image width
-    const int   height   = 480;     // image height
+int main(int argc, char **argv) {
+    float factor = 1;
+    if (argc > 2) {
+        std::cerr << "Usage: " << argv[0] << " [factor]" << std::endl;
+        return 1;
+    } else if (argc == 2) {
+        std::string arg = argv[1];
+        factor = std::stof(arg);
+    }
+
+    const int   width    = 640*factor; // image width
+    const int   height   = 480*factor; // image height
     const float fov      = M_PI/3.; // field of view angle
     std::vector<Vec3f> framebuffer(width*height);
 

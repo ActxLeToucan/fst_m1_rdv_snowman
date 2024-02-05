@@ -15,3 +15,9 @@ cd build
 cmake ..  
 make
 ```
+
+## Utilisation
+```sh
+./tinykaboom [factor]
+```
+* `factor` : flottant, facteur sur la taille de l'image (par défaut 1.0)
