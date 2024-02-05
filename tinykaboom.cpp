@@ -95,13 +95,26 @@ const Shape body = Shape({
        Sphere(Vec3f(0, 0.85, 0), 0.35)
 }, Vec3f(1, 1, 1), 0.15);
 const Shape carrot = Shape({ // TODO: donner une vraie forme de carotte à la carotte et la placer correctement
-       Sphere(Vec3f(1.5, 1, 0), 0.5),
-       Sphere(Vec3f(1.5, 0, 0), 0.25),
-       Sphere(Vec3f(2.5, 0, 0), 0.25),
-       Sphere(Vec3f(2, -0.5, 0), 0.25),
-}, Vec3f(0.89, 0.38, 0.12), 0.04, 0.5);
+        Sphere(Vec3f(0, 0.80, 0.35), 0.08),
+        Sphere(Vec3f(0, 0.83, 0.55), 0.06),
+        Sphere(Vec3f(0, 0.86, 0.69), 0.03),
+        Sphere(Vec3f(0, 0.89, 0.83), 0.01),
 
-const std::vector<Shape> shapes = {body, carrot};
+}, Vec3f(0.89, 0.38, 0.12), 0.04, 0.17);
+const Shape eye = Shape({ 
+        Sphere(Vec3f(0.19, 0.90, 0.32), 0.005),
+        Sphere(Vec3f(0.19, 0.99, 0.32), 0.005),
+        Sphere(Vec3f(-0.19, 0.90, 0.32), 0.005),
+        Sphere(Vec3f(-0.19, 0.99, 0.32), 0.005),
+}, Vec3f(0.228, 0.278, 0.278), 0.09, 0.12);
+
+const Shape stone = Shape({ 
+        Sphere(Vec3f(0, -1.5, 0.98), 0.045),
+        Sphere(Vec3f(0, -0.85, 0.75), 0.045),
+        Sphere(Vec3f(0, -0.1, 0.64), 0.045),
+}, Vec3f(0.328, 0.328, 0.328), 0.15);
+
+const std::vector<Shape> shapes = {body, carrot, eye, stone};
 
 float signed_distance(const Vec3f &p, Vec3f *color = nullptr) { // this function defines the implicit surface we render
     float d = std::numeric_limits<float>::max();
