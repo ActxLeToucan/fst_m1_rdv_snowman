@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "geometry.h"
+#include "Object.h"
 
 template <typename T> inline T lerp(const T &v0, const T &v1, float t) {
     return v0 + (v1-v0)*std::max(0.f, std::min(1.f, t));
@@ -43,26 +43,15 @@ float fractal_brownian_motion(const Vec3f &x) { // this is a bad noise function 
     return f/0.9375;
 }
 
-struct Sphere {
-    const Vec3f orig;
-    const float radius;
-
-    Sphere(const Vec3f &o, const float &r) : orig(o), radius(r) {}
-
-    [[nodiscard]] float getDistance(const Vec3f &p) const {
-        return (p - orig).norm() - radius;
-    }
-};
-
 struct Shape {
-    const std::vector<Sphere> spheres;
-    const Vec3f color = Vec3f(1, 1, 1);
-    const float noise_amplitude = 0.; // amount of noise applied to the sphere (towards the center)
-    const float rFusionLisse = 0.;
+    const std::vector<Object*> objects;
+    const Vec3f color;
+    const float noise_amplitude; // amount of noise applied to the sphere (towards the center)
+    const float rFusionLisse;
 
-    explicit Shape(const std::vector<Sphere> &spheres, const Vec3f &color = Vec3f(1, 1, 1),
+    explicit Shape(const std::vector<Object*> &objects, const Vec3f &color = Vec3f(1, 1, 1),
                    const float &noise_amplitude = 0., const float &rFusionLisse = 0.)
-                   : spheres(spheres), color(color), noise_amplitude(noise_amplitude), rFusionLisse(rFusionLisse) {}
+            : objects(objects), color(color), noise_amplitude(noise_amplitude), rFusionLisse(rFusionLisse) {}
 
     [[nodiscard]] float getDistance(const Vec3f &p) const {
         float displacement = -fractal_brownian_motion(p*3.4)*noise_amplitude;
@@ -70,10 +59,10 @@ struct Shape {
         // ----------------- Fusion lisse -----------------
         // à partir du code du dernier TP d'Infographie de l'année dernière
         // Distance initiale
-        float res = !spheres.empty() ? spheres[0].getDistance(p) : std::numeric_limits<float>::max();
+        float res = !objects.empty() ? objects[0]->getDistance(p) : std::numeric_limits<float>::max();
         // Parcours des autres sphères
-        for (size_t i = 1; i < spheres.size(); ++i) {
-            float dst = spheres[i].getDistance(p);
+        for (size_t i = 1; i < objects.size(); ++i) {
+            float dst = objects[i]->getDistance(p);
             res = smin(res, dst, rFusionLisse);
         }
         // -------------------------------------------------
@@ -81,7 +70,7 @@ struct Shape {
         return res + displacement;
     }
 
-    private :
+private :
     // à partir du code du dernier TP d'Infographie de l'année dernière
     static float smin(float dA, float dB, float r) {
         float c = std::clamp(0.5f * (1.0f + (dB - dA) / r), 0.0f, 1.0f);
@@ -90,38 +79,41 @@ struct Shape {
 };
 
 const Shape body = Shape({
-       Sphere(Vec3f(0, -1.5, 0), 1.),
-       Sphere(Vec3f(0, -0.1, 0), 0.66),
-       Sphere(Vec3f(0, 0.85, 0), 0.35)
+    new Sphere(Vec3f(0, -1.5, 0), 1.),
+    new Sphere(Vec3f(0, -0.1, 0), 0.66),
+    new Sphere(Vec3f(0, 0.85, 0), 0.35)
 }, Vec3f(1, 1, 1), 0.15);
-const Shape carrot = Shape({ // TODO: donner une vraie forme de carotte à la carotte et la placer correctement
-        Sphere(Vec3f(0, 0.80, 0.35), 0.08),
-        Sphere(Vec3f(0, 0.83, 0.55), 0.06),
-        Sphere(Vec3f(0, 0.86, 0.69), 0.03),
-        Sphere(Vec3f(0, 0.89, 0.83), 0.01),
-
+const Shape carrot = Shape({
+    new Sphere(Vec3f(0, 0.80, 0.35), 0.08),
+    new Sphere(Vec3f(0, 0.83, 0.55), 0.06),
+    new Sphere(Vec3f(0, 0.86, 0.69), 0.03),
+    new Sphere(Vec3f(0, 0.89, 0.83), 0.01),
 }, Vec3f(0.89, 0.38, 0.12), 0.04, 0.17);
-const Shape eye = Shape({ 
-        Sphere(Vec3f(0.19, 0.90, 0.32), 0.005),
-        Sphere(Vec3f(0.19, 0.99, 0.32), 0.005),
-        Sphere(Vec3f(-0.19, 0.90, 0.32), 0.005),
-        Sphere(Vec3f(-0.19, 0.99, 0.32), 0.005),
+const Shape eye = Shape({
+    new Sphere(Vec3f(0.19, 0.90, 0.32), 0.005),
+    new Sphere(Vec3f(0.19, 0.99, 0.32), 0.005),
+    new Sphere(Vec3f(-0.19, 0.90, 0.32), 0.005),
+    new Sphere(Vec3f(-0.19, 0.99, 0.32), 0.005),
 }, Vec3f(0.228, 0.278, 0.278), 0.09, 0.12);
-const Shape stone = Shape({ 
-        Sphere(Vec3f(0, -1.5, 0.98), 0.045),
-        Sphere(Vec3f(0, -0.85, 0.75), 0.045),
-        Sphere(Vec3f(0, -0.1, 0.64), 0.045),
+const Shape stone = Shape({
+    new Sphere(Vec3f(0, -1.5, 0.98), 0.045),
+    new Sphere(Vec3f(0, -0.85, 0.75), 0.045),
+    new Sphere(Vec3f(0, -0.1, 0.64), 0.045),
 }, Vec3f(0.328, 0.328, 0.328), 0.15);
 const Shape scarf_part1 = Shape({
-        Sphere(Vec3f(0, 0.52, 0), 0.44)
+    new Sphere(Vec3f(0, 0.52, 0), 0.44)
 }, Vec3f(0.67, 0.11, 0.12), 0.05, 0);
 const Shape scarf_part2 = Shape({
-        Sphere(Vec3f(0.18, 0.61, 0.28), 0.15),
-        Sphere(Vec3f(0.32, 0.24, 0.5), 0.09),
-        Sphere(Vec3f(0.2, -0.1, 0.64), 0.09),
+    new Sphere(Vec3f(0.18, 0.61, 0.28), 0.15),
+    new Sphere(Vec3f(0.32, 0.24, 0.5), 0.09),
+    new Sphere(Vec3f(0.2, -0.1, 0.64), 0.09),
 }, Vec3f(0.67, 0.11, 0.12), 0.05, 0.5);
+const Shape hat = Shape({
+    new Cylinder(Vec3f(0, 1.2, 0), Vec3f(0, 1.7, 0), 0.3),
+    new Cylinder(Vec3f(0, 1.15, 0), Vec3f(0, 1.2, 0), 0.5),
+}, Vec3f(0.2, 0.2, 0.2));
 
-const std::vector<Shape> shapes = {body, carrot, eye, stone, scarf_part1, scarf_part2};
+const std::vector<Shape> shapes = {body, carrot, eye, stone, scarf_part1, scarf_part2, hat};
 
 float signed_distance(const Vec3f &p, Vec3f *color = nullptr) { // this function defines the implicit surface we render
     float d = std::numeric_limits<float>::max();

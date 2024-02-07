@@ -49,5 +49,17 @@ template<size_t DIM,typename T> vec<DIM,T> operator-(const vec<DIM,T> &lhs) {
 
 typedef vec<3, float> Vec3f;
 
+float dot(Vec3f a, Vec3f b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+float length(Vec3f v) {
+    return sqrt(dot(v, v));
+}
+
+int sign(float x) {
+    return (x > 0) - (x < 0);
+}
+
 #endif //__GEOMETRY_H__
 
