@@ -12,12 +12,12 @@ template <typename T> inline T lerp(const T &v0, const T &v1, float t) {
 }
 
 float hash(const float n) {
-    float x = sin(n)*43758.5453f;
-    return x-floor(x);
+    float x = std::sin(n)*43758.5453f;
+    return x-std::floor(x);
 }
 
 float noise(const Vec3f &x) {
-    Vec3f p(floor(x.x), floor(x.y), floor(x.z));
+    Vec3f p(std::floor(x.x), std::floor(x.y), std::floor(x.z));
     Vec3f f(x.x-p.x, x.y-p.y, x.z-p.z);
     f = f*(f*(Vec3f(3.f, 3.f, 3.f)-f*2.f));
     float n = p*Vec3f(1.f, 57.f, 113.f);
@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
         for (size_t i = 0; i<width; i++) {
             float dir_x =  (i + 0.5) -  width/2.;
             float dir_y = -(j + 0.5) + height/2.;    // this flips the image at the same time
-            float dir_z = -height/(2.*tan(fov/2.));
+            float dir_z = -height/(2.*std::tan(fov/2.));
             Vec3f hit, color;
             if (sphere_trace(Vec3f(0, 0, 5), Vec3f(dir_x, dir_y, dir_z).normalize(), hit, color)) { // the camera is placed to (0,0,3) and it looks along the -z axis
                 Vec3f light_dir = (Vec3f(10, 10, 10) - hit).normalize();                     // one light is placed to (10,10,10)

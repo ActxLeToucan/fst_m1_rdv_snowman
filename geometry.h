@@ -54,7 +54,7 @@ float dot(Vec3f a, Vec3f b) {
 }
 
 float length(Vec3f v) {
-    return sqrt(dot(v, v));
+    return std::sqrt(dot(v, v));
 }
 
 int sign(float x) {
