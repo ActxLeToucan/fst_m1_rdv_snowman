@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8)
-project (tinykaboom)
+project (fst_m1_rdv_snowman)
 
 include(CheckCXXCompilerFlag)
 

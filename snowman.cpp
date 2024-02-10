@@ -95,7 +95,7 @@ struct Shape {
         // à partir du code du dernier TP d'Infographie de l'année dernière
         // Distance initiale
         float res = !objects.empty() ? objects[0]->getDistance(p) : std::numeric_limits<float>::max();
-        // Parcours des autres sphères
+        // Parcours des autres objets
         for (size_t i = 1; i < objects.size(); ++i) {
             float dst = objects[i]->getDistance(p);
             res = smin(res, dst, rFusionLisse);

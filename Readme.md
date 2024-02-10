@@ -34,6 +34,7 @@ make
 
 ## Utilisation
 ```sh
-./tinykaboom [factor]
+./fst_m1_rdv_snowman [factor]
 ```
-* `factor` : flottant, facteur sur la taille de l'image (par défaut 1.0)
+* `factor` : flottant, facteur sur la taille de l'image (par défaut 1.0). Permet de générer une image plus petite
+(et donc plus rapidement) par exemple lors du développement, ou plus grande pour une image finale.
