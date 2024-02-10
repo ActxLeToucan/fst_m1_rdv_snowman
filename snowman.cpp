@@ -197,8 +197,8 @@ int main(int argc, char **argv) {
     std::vector<Vec3f> framebuffer(width*height);
 
 #pragma omp parallel for
-    for (size_t j = 0; j<height; j++) { // actual rendering loop
-        for (size_t i = 0; i<width; i++) {
+    for (int j = 0; j<height; j++) { // actual rendering loop
+        for (int i = 0; i<width; i++) {
             float dir_x =  (i + 0.5) -  width/2.;
             float dir_y = -(j + 0.5) + height/2.;    // this flips the image at the same time
             float dir_z = -height/(2.*std::tan(fov/2.));
@@ -215,8 +215,8 @@ int main(int argc, char **argv) {
 
     std::ofstream ofs("./out.ppm", std::ios::binary); // save the framebuffer to file
     ofs << "P6\n" << width << " " << height << "\n255\n";
-    for (size_t i = 0; i < height*width; ++i) {
-        for (size_t j = 0; j<3; j++) {
+    for (int i = 0; i < height*width; ++i) {
+        for (int j = 0; j<3; j++) {
             ofs << (char)(std::max(0, std::min(255, static_cast<int>(255*framebuffer[i][j]))));
         }
     }
