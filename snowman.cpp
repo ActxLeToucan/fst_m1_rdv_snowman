@@ -38,7 +38,8 @@
 #include <algorithm>
 #include <limits>
 #include <iostream>
-#include <fstream>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include <vector>
 #include "Object.h"
 
@@ -213,14 +214,17 @@ int main(int argc, char **argv) {
         }
     }
 
-    std::ofstream ofs("./out.ppm", std::ios::binary); // save the framebuffer to file
-    ofs << "P6\n" << width << " " << height << "\n255\n";
+    // save the framebuffer to file
+    std::vector<unsigned char> pixmap(width*height*3);
     for (int i = 0; i < height*width; ++i) {
+        Vec3f &c = framebuffer[i];
+        float max = std::max(c[0], std::max(c[1], c[2]));
+        if (max>1) c = c*(1./max);
         for (int j = 0; j<3; j++) {
-            ofs << (char)(std::max(0, std::min(255, static_cast<int>(255*framebuffer[i][j]))));
+            pixmap[i*3+j] = (unsigned char)(255 * std::max(0.f, std::min(1.f, framebuffer[i][j])));
         }
     }
-    ofs.close();
+    stbi_write_jpg("out.jpg", width, height, 3, pixmap.data(), 100);
 
     return 0;
 }

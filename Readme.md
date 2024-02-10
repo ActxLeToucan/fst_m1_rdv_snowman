@@ -19,8 +19,13 @@ Nous vous invitons à consulter le fichier [LICENSE](./LICENSE) pour plus d'info
 * [Antoine Contoux](https://github.com/ActxLeToucan)
 * [Guillaume Renard](https://github.com/dranerine)
 ### Code tiers
-* [Dmitry V. Sokolov](https://github.com/ssloy), auteur du projet original, sous license [WTFPL](https://spdx.org/licenses/WTFPL)
-* [Inigo Quilez](https://iquilezles.org/), auteur de la fonction du calcul de distance à un cylindre (dans [Object.h](./Object.h)), sous license [MIT](https://spdx.org/licenses/MIT)
+* [Dmitry V. Sokolov](https://github.com/ssloy)
+  * [tinykaboom](https://github.com/ssloy/tinykaboom), sous license [WTFPL](https://spdx.org/licenses/WTFPL), projet original
+  * [tinyraytracer](https://github.com/ssloy/tinyraytracer), sous license [WTFPL](https://spdx.org/licenses/WTFPL),
+  pour le code permettant de charger et d'écrire des images avec la bibliothèque [stb](https://github.com/nothings/stb)
+* [Inigo Quilez](https://iquilezles.org/), auteur de la fonction du calcul de distance à un cylindre, sous license [MIT](https://spdx.org/licenses/MIT)
+### Bibliothèques
+* [stb](https://github.com/nothings/stb), sous license [MIT](https://spdx.org/licenses/MIT)
 
 ## Compilation
 ```sh

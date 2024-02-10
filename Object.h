@@ -33,8 +33,8 @@
 // pris connaissance de la licence CeCILL-B, et que vous en avez accepté les
 // termes.
 
-#ifndef TINYKABOOM_OBJECT_H
-#define TINYKABOOM_OBJECT_H
+#ifndef FST_M1_RDV_SNOWMAN_OBJECT_H
+#define FST_M1_RDV_SNOWMAN_OBJECT_H
 
 
 #include "geometry.h"
@@ -80,4 +80,4 @@ public:
 };
 
 
-#endif //TINYKABOOM_OBJECT_H
+#endif //FST_M1_RDV_SNOWMAN_OBJECT_H
