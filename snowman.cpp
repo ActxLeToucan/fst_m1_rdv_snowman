@@ -38,9 +38,15 @@
 #include <algorithm>
 #include <limits>
 #include <iostream>
-#include <fstream>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include <vector>
 #include "Object.h"
+
+std::vector<Vec3f> envmap;
+int envmap_width, envmap_height;
 
 template <typename T> inline T lerp(const T &v0, const T &v1, float t) {
     return v0 + (v1-v0)*std::max(0.f, std::min(1.f, t));
@@ -208,6 +214,28 @@ Vec3f distance_field_normal(const Vec3f &pos) { // simple finite differences, ve
     return Vec3f(nx, ny, nz).normalize();
 }
 
+bool loadEnvmap() {
+    int n = -1;
+    unsigned char *envmap_pixmap = stbi_load("../envmap.jpg", &envmap_width, &envmap_height, &n, 0);
+    if (!envmap_pixmap || 3!=n) {
+        std::cerr << "Error: can not load the environment map" << std::endl;
+        return false;
+    }
+
+    envmap = std::vector<Vec3f>(envmap_width*envmap_height);
+    for (int j = envmap_height - 1; j >= 0; j--) {
+        for (int i = 0; i < envmap_width; i++) {
+            envmap[i + j * envmap_width] = Vec3f(
+                    envmap_pixmap[(i + j * envmap_width) * 3 + 0],
+                    envmap_pixmap[(i + j * envmap_width) * 3 + 1],
+                    envmap_pixmap[(i + j * envmap_width) * 3 + 2]
+            ) * (1 / 255.);
+        }
+    }
+    stbi_image_free(envmap_pixmap);
+    return true;
+}
+
 int main(int argc, char **argv) {
     float factor = 1;
     if (argc > 2) {
@@ -217,6 +245,8 @@ int main(int argc, char **argv) {
         std::string arg = argv[1];
         factor = std::stof(arg);
     }
+
+    bool envmapLoaded = loadEnvmap();
 
     const int   width    = 640*factor; // image width
     const int   height   = 480*factor; // image height
@@ -229,25 +259,37 @@ int main(int argc, char **argv) {
             float dir_x =  (i + 0.5) -  width/2.;
             float dir_y = -(j + 0.5) + height/2.;    // this flips the image at the same time
             float dir_z = -height/(2.*std::tan(fov/2.));
+            Vec3f dir = Vec3f(dir_x, dir_y, dir_z).normalize();
             Vec3f hit, color;
-            if (sphere_trace(Vec3f(0, 0, 5), Vec3f(dir_x, dir_y, dir_z).normalize(), hit, color)) { // the camera is placed to (0,0,3) and it looks along the -z axis
+            if (sphere_trace(Vec3f(0, 0, 5), dir, hit, color)) { // the camera is placed to (0,0,5) and it looks along the -z axis
                 Vec3f light_dir = (Vec3f(10, 10, 10) - hit).normalize();                     // one light is placed to (10,10,10)
                 float light_intensity  = std::max(0.4f, light_dir*distance_field_normal(hit));
                 framebuffer[i+j*width] = color * light_intensity;
             } else {
-                framebuffer[i+j*width] = Vec3f(0.2, 0.7, 0.8); // background color
+                if (envmapLoaded) {
+                    float u = (std::atan2(dir.z, dir.x) + M_PI) / (2*M_PI);
+                    float v = std::acos(dir.y) / M_PI;
+                    int x = std::min(envmap_width  - 1, int(u * envmap_width));
+                    int y = std::min(envmap_height - 1, int(v * envmap_height));
+                    framebuffer[i+j*width] = envmap[x + y * envmap_width];
+                } else {
+                    framebuffer[i+j*width] = Vec3f(0.2, 0.7, 0.8); // background color
+                }
             }
         }
     }
 
-    std::ofstream ofs("./out.ppm", std::ios::binary); // save the framebuffer to file
-    ofs << "P6\n" << width << " " << height << "\n255\n";
+    // save the framebuffer to file
+    std::vector<unsigned char> pixmap(width*height*3);
     for (int i = 0; i < height*width; ++i) {
+        Vec3f &c = framebuffer[i];
+        float max = std::max(c[0], std::max(c[1], c[2]));
+        if (max>1) c = c*(1./max);
         for (int j = 0; j<3; j++) {
-            ofs << (char)(std::max(0, std::min(255, static_cast<int>(255*framebuffer[i][j]))));
+            pixmap[i*3+j] = (unsigned char)(255 * std::max(0.f, std::min(1.f, framebuffer[i][j])));
         }
     }
-    ofs.close();
+    stbi_write_jpg("out.jpg", width, height, 3, pixmap.data(), 100);
 
     return 0;
 }
