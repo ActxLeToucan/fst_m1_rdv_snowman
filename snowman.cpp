@@ -147,8 +147,35 @@ const Shape hat = Shape({
     new Cylinder(Vec3f(0, 1.2, 0), Vec3f(0, 1.7, 0), 0.3),
     new Cylinder(Vec3f(0, 1.15, 0), Vec3f(0, 1.2, 0), 0.5),
 }, Vec3f(0.2, 0.2, 0.2));
+const Shape branchLeft = Shape({ 
+    new Cylinder(Vec3f(-0.66, 0.1, 0.30), Vec3f(-1.2, 0.2, 0.30), 0.015),
+    new Cylinder(Vec3f(-0.90, 0.18, 0.30), Vec3f(-1.09, 0.53, 0.28), 0.01),
+    new Cylinder(Vec3f(-0.88, 0.10, 0.32), Vec3f(-1.22, -0.25, 0.36), 0.01)
+}, Vec3f(0.554, 0.417, 0.35), 0.06, 0.03);
+const Shape branchRight = Shape({ 
+    new Cylinder(Vec3f(0.63, -0.05, 0.30), Vec3f(1.09, 0.15, 0.35), 0.025),
+    new Cylinder(Vec3f(1.1, 0.17, 0.35), Vec3f(1.46, 0, 0.41), 0.01),
+    new Cylinder(Vec3f(1.19, 0.20, 0.33), Vec3f(1.5, 0.41, 0.25), 0.022)
+}, Vec3f(0.554, 0.417, 0.35), 0.06, 0.05);
+const Shape rake = Shape({
+    new Cylinder(Vec3f(1.5, -2.5, 0.35), Vec3f(1.25, 1, 0.35), 0.06), // tige du balai
+    new Cylinder(Vec3f(0.80, 0.95, 0.35), Vec3f(1.70, 1.05, 0.35), 0.04),
+    new Cylinder(Vec3f(0.80, 0.95, 0.35), Vec3f(0.75, 1.28, 0.37), 0.02),
+    new Cylinder(Vec3f(0.87, 0.95, 0.35), Vec3f(0.82, 1.28, 0.37), 0.02),
+    new Cylinder(Vec3f(0.95, 0.95, 0.35), Vec3f(0.90, 1.28, 0.37), 0.02),
+    new Cylinder(Vec3f(1.02, 0.96, 0.35), Vec3f(0.97, 1.29, 0.37), 0.02),
+    new Cylinder(Vec3f(1.1, 0.97, 0.35), Vec3f(1.05, 1.29, 0.37), 0.02),
+    new Cylinder(Vec3f(1.17, 0.97, 0.35), Vec3f(1.12, 1.29, 0.37), 0.02),
+    new Cylinder(Vec3f(1.25, 0.99, 0.35), Vec3f(1.20, 1.33, 0.37), 0.02),
+    new Cylinder(Vec3f(1.32, 0.99, 0.35), Vec3f(1.27, 1.33, 0.37), 0.02),
+    new Cylinder(Vec3f(1.40, 1.0, 0.35), Vec3f(1.35, 1.36, 0.37), 0.02),
+    new Cylinder(Vec3f(1.47, 1.0, 0.35), Vec3f(1.42, 1.36, 0.37), 0.02),
+    new Cylinder(Vec3f(1.55, 1.05, 0.35), Vec3f(1.50, 1.39, 0.37), 0.02),
+    new Cylinder(Vec3f(1.62, 1.05, 0.35), Vec3f(1.57, 1.40, 0.37), 0.02),
+    new Cylinder(Vec3f(1.70, 1.05, 0.35), Vec3f(1.65, 1.41, 0.37), 0.02)
+}, Vec3f(0.554, 0.5, 0.35));
 
-const std::vector<Shape> shapes = {body, carrot, eye, stone, scarf_part1, scarf_part2, hat};
+const std::vector<Shape> shapes = {body, carrot, eye, stone, scarf_part1, scarf_part2, hat, branchLeft, branchRight, rake};
 
 float signed_distance(const Vec3f &p, Vec3f *color = nullptr) { // this function defines the implicit surface we render
     float d = std::numeric_limits<float>::max();
