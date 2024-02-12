@@ -237,13 +237,28 @@ bool loadEnvmap() {
 }
 
 int main(int argc, char **argv) {
+    bool showProgress = false;
     float factor = 1;
-    if (argc > 2) {
-        std::cerr << "Usage: " << argv[0] << " [factor]" << std::endl;
+    if (argc > 3) {
+        std::cerr << "Usage: " << argv[0] << " [factor] [-v]" << std::endl;
         return 1;
     } else if (argc == 2) {
-        std::string arg = argv[1];
-        factor = std::stof(arg);
+        if (std::string(argv[1]) == "-v") {
+            showProgress = true;
+        } else {
+            std::string arg = argv[1];
+            factor = std::stof(arg);
+        }
+    } else if (argc == 3) {
+        std::string arg1 = argv[1];
+        factor = std::stof(arg1);
+        std::string arg2 = argv[2];
+        if (arg2 == "-v") {
+            showProgress = true;
+        } else {
+            std::cerr << "Usage: " << argv[0] << " [factor] [-v]" << std::endl;
+            return 1;
+        }
     }
 
     bool envmapLoaded = loadEnvmap();
@@ -253,6 +268,7 @@ int main(int argc, char **argv) {
     const float fov      = M_PI/3.; // field of view angle
     std::vector<Vec3f> framebuffer(width*height);
 
+    int nbComputedPixels = 0;
 #pragma omp parallel for
     for (int j = 0; j<height; j++) { // actual rendering loop
         for (int i = 0; i<width; i++) {
@@ -274,6 +290,13 @@ int main(int argc, char **argv) {
                     framebuffer[i+j*width] = envmap[x + y * envmap_width];
                 } else {
                     framebuffer[i+j*width] = Vec3f(0.2, 0.7, 0.8); // background color
+                }
+            }
+            if (showProgress) {
+                // certainement pas precis, mais ça donne une petite une idée de l'avancement
+                nbComputedPixels++;
+                if (nbComputedPixels % 10000 == 0) {
+                    std::cout << "\033[H\033[2JRendering: " << (100. * nbComputedPixels / (width * height)) << "%" << std::endl;
                 }
             }
         }

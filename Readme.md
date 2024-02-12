@@ -37,7 +37,33 @@ make
 
 ## Utilisation
 ```sh
-./fst_m1_rdv_snowman [factor]
+./fst_m1_rdv_snowman [factor] [-v]
 ```
 * `factor` : flottant, facteur sur la taille de l'image (par défaut 1.0). Permet de générer une image plus petite
 (et donc plus rapidement) par exemple lors du développement, ou plus grande pour une image finale.
+* `-v` : optionnel, active l'affichage de la progression du rendu (recommandé pour les images de grande taille).
+
+### Astuce pour les utilisateurs de Windows
+Si vous utilisez Windows et que tous les processeurs logiques de votre machine ne sont pas utilisés, vous pouvez
+vous rendre dans le gestionnaire des tâches, onglet *Détails*, clic droit sur le processus `fst_m1_rdv_snowman.exe`,
+puis *Définir l'affinité*, et cocher tous les processeurs logiques disponibles.
+
+## Résultat
+![Résultat](./out.jpg)
+Voici le résultat de notre travail. Nous espérons que vous apprécierez notre bonhomme de neige.
+Le rendu ci-dessus a été généré avec un facteur de 4.0.
+
+Nous avons choisit de bruiter la plupart de nos formes pour donner un aspect plus naturel à notre bonhomme de neige.
+
+### Performances
+#### Facteur 1.0
+| Nom       | Cœurs | Threads | Fréquence de base | Temps de rendu |
+|-----------|-------|---------|-------------------|----------------|
+| i5-10600K | 6     | 12      | 4.1 GHz           | 40 s           |
+| i5-1240P  | 12    | 16      | 1.7 GHz           | 20 s           |
+
+#### Facteur 4.0
+| Nom       | Cœurs | Threads | Fréquence de base | Temps de rendu |
+|-----------|-------|---------|-------------------|----------------|
+| i5-10600K | 6     | 12      | 4.1 GHz           | 10 min         |
+| i5-1240P  | 12    | 16      | 1.7 GHz           | 6 min          |
