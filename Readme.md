@@ -39,7 +39,7 @@ make
 ```sh
 ./fst_m1_rdv_snowman [factor] [-v]
 ```
-* `factor` : flottant, facteur sur la taille de l'image (par défaut 1.0). Permet de générer une image plus petite
+* `factor` : flottant, facteur sur les dimensions de l'image (par défaut 1.0). Permet de générer une image plus petite
 (et donc plus rapidement) par exemple lors du développement, ou plus grande pour une image finale.
 * `-v` : optionnel, active l'affichage de la progression du rendu (recommandé pour les images de grande taille).
 
@@ -50,20 +50,27 @@ puis *Définir l'affinité*, et cocher tous les processeurs logiques disponibles
 
 ## Résultat
 ![Résultat](./out.jpg)
-Voici le résultat de notre travail. Nous espérons que vous apprécierez notre bonhomme de neige.
-Le rendu ci-dessus a été généré avec un facteur de 4.0.
+Voici le résultat de notre travail. Le rendu ci-dessus a été généré avec un facteur de 4.0.
 
 Nous avons choisit de bruiter la plupart de nos formes pour donner un aspect plus naturel à notre bonhomme de neige.
+Nous espérons que vous apprécierez le résultat.
 
 ### Performances
-#### Facteur 1.0
-| Nom       | Cœurs | Threads | Fréquence de base | Temps de rendu |
-|-----------|-------|---------|-------------------|----------------|
-| i5-10600K | 6     | 12      | 4.1 GHz           | 40 s           |
-| i5-1240P  | 12    | 16      | 1.7 GHz           | 20 s           |
+On nous a donné une limite de 1h de rendu (sans préciser la taille de l'image).
+
+Avec les résultats suivants, nous pouvons estimer que nous sommes en mesure de générer une image avec la taille
+par défaut (640x480) dans le temps imparti sur la plupart des machines.
+
+#### Facteur 1.0 (par défaut)
+| Nom             | Cœurs | Threads | Fréquence de base | Temps de rendu |
+|-----------------|-------|---------|-------------------|----------------|
+| Intel i5-10600K | 6     | 12      | 4.10 GHz          | 40 s           |
+| Intel i5-1240P  | 12    | 16      | 1.70 GHz          | 20 s           |
+| Ryzen 7 7737U   | 8     | 16      | 2.70 GHz          | 18 s           |
 
 #### Facteur 4.0
-| Nom       | Cœurs | Threads | Fréquence de base | Temps de rendu |
-|-----------|-------|---------|-------------------|----------------|
-| i5-10600K | 6     | 12      | 4.1 GHz           | 10 min         |
-| i5-1240P  | 12    | 16      | 1.7 GHz           | 6 min          |
+| Nom             | Cœurs | Threads | Fréquence de base | Temps de rendu |
+|-----------------|-------|---------|-------------------|----------------|
+| Intel i5-10600K | 6     | 12      | 4.10 GHz          | 10 min         |
+| Intel i5-1240P  | 12    | 16      | 1.70 GHz          | 6 min          |
+| Ryzen 7 7737U   | 8     | 16      | 2.70 GHz          | 5 min          |
